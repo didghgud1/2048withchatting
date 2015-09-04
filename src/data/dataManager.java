@@ -80,68 +80,46 @@ public class dataManager {
 	private void mergeButton(buttonInfo[][] tBtInfo, int keyCode) {
 		if(keyCode == KEY_LEFT) {
 			for(int i=0; i<4; i++) {
-				for(int j=0; j<4; j++) {
-					if(i < 4 && tBtInfo[i][j].getNum() != 0) {
-						for(int k=0; k<3; k++) {
-							if(tBtInfo[i][k].getNum() != 0 
-								&& (tBtInfo[i][k].getNum() == tBtInfo[i][k+1].getNum())) {
-								tBtInfo[i][k].setNum(tBtInfo[i][k+1].getNum()*2);
-								tBtInfo[i][k+1].setNum(0);
-								i++;
-								j=0;
-								break;
-							}
+				for(int j=0; j<3; j++) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						if(tBtInfo[i][j].getNum() == tBtInfo[i][j+1].getNum()) {
+							tBtInfo[i][j].setNum(tBtInfo[i][j+1].getNum()*2);
+							tBtInfo[i][j+1].setNum(0);
 						}
 					}
 				}
 			}
 		}else if(keyCode == KEY_UP) {
 			for(int i=3; i>=0; i--) {
-				for(int j=0; j<4; j++) {
-					if(i >= 0 && tBtInfo[j][i].getNum() != 0) {
-						for(int k=0; k<3; k++) {
-							if(tBtInfo[j][i].getNum() != 0 
-								&& (tBtInfo[k][i].getNum() == tBtInfo[k+1][i].getNum())) {
-								tBtInfo[k][i].setNum(tBtInfo[k+1][i].getNum()*2);
-								tBtInfo[k+1][i].setNum(0);
-								i--;
-								j=0;
-								break;
-							}
+				for(int j=0; j<3; j++) {
+					if(tBtInfo[j][i].getNum() != 0) {
+						if(tBtInfo[j][i].getNum() == tBtInfo[j+1][i].getNum()) {
+							tBtInfo[j][i].setNum(tBtInfo[j+1][i].getNum()*2);
+							tBtInfo[j+1][i].setNum(0);
 						}
 					}
 				}
 			}
 		}else if(keyCode == KEY_RIGHT) {
 			for(int i=0; i<4; i++) {
-				for(int j=3; j>=0; j--) {
-					if(i < 4 && tBtInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=1; k--) {
-							if(tBtInfo[i][k].getNum() != 0 
-								&& (tBtInfo[i][k].getNum() == tBtInfo[i][k-1].getNum())) {
-								tBtInfo[i][k].setNum(tBtInfo[i][k-1].getNum()*2);
-								tBtInfo[i][k-1].setNum(0);
-								i++;
-								j=3;
-								break;
+				for(int j=3; j>0; j--) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						if(tBtInfo[i][j].getNum() != 0) {
+							if(tBtInfo[i][j].getNum() == tBtInfo[i][j-1].getNum()) {
+								tBtInfo[i][j].setNum(tBtInfo[i][j-1].getNum()*2);
+								tBtInfo[i][j-1].setNum(0);
 							}
 						}
 					}
 				}
 			}
 		}else if(keyCode == KEY_DOWN) {
-			for(int i=3; i>=0; i--) {
+			for(int i=3; i>0; i--) {
 				for(int j=3; j>=0; j--) {
-					if(i >= 0 && tBtInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=1; k--) {
-							if(tBtInfo[k][j].getNum() != 0 
-								&& (tBtInfo[k][j].getNum() == tBtInfo[k-1][j].getNum())) {
-								tBtInfo[k][j].setNum(tBtInfo[k-1][j].getNum()*2);
-								tBtInfo[k-1][j].setNum(0);
-								i--;
-								j=3;
-								break;
-							}
+					if(tBtInfo[i][j].getNum() != 0) {
+						if(tBtInfo[i][j].getNum() == tBtInfo[i-1][j].getNum()) {
+							tBtInfo[i][j].setNum(tBtInfo[i-1][j].getNum()*2);
+							tBtInfo[i-1][j].setNum(0);
 						}
 					}
 				}

@@ -70,7 +70,6 @@ public class MainUI extends JFrame {
 		jtInputTextArea = new JTextArea();
 		jsInputTextPane = new JScrollPane(jtInputTextArea);
 		jbClickButton = new JButton("Send");
-
 	}
 
 	private void setResourceListener() {
@@ -90,8 +89,11 @@ public class MainUI extends JFrame {
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
 				System.out.println("Key Pressed key code is" + e.getKeyCode());
+				//Process DB Data then change each button data
 				dbController.processKeyData(e.getKeyCode());
+				//redraw UI to correct information
 				refreshUI();
+				//Check the condition of end of this game
 			}
 		});
 	}
@@ -100,15 +102,15 @@ public class MainUI extends JFrame {
 		Container container = this.getContentPane();
 		
 		jpGamePanel.setBounds(0, 10, 400, 400);
-		for(int i=1; i<=4; i++) {
-			for(int j=1; j<=4; j++) {
-				jbNumber[i-1][j-1].setBounds(100*(j-1), 100*(i-1), 100, 100);
-				jbNumber[i-1][j-1].setPreferredSize(new Dimension(80, 80));
-				jbNumber[i-1][j-1].setBorderPainted(false);
-				jbNumber[i-1][j-1].setFont(new Font("Arial", Font.PLAIN, 20));
-				jbNumber[i-1][j-1].setBackground(Color.WHITE);
-				jbNumber[i-1][j-1].setEnabled(false);
-				jpGamePanel.add(jbNumber[i-1][j-1]);
+		for(int i=0; i<4; i++) {
+			for(int j=0; j<4; j++) {
+				jbNumber[i][j].setBounds(100*j, 100*i, 100, 100);
+				jbNumber[i][j].setPreferredSize(new Dimension(80, 80));
+				jbNumber[i][j].setBorderPainted(false);
+				jbNumber[i][j].setFont(new Font("Arial", Font.PLAIN, 20));
+				jbNumber[i][j].setBackground(Color.WHITE);
+				jbNumber[i][j].setEnabled(false);
+				jpGamePanel.add(jbNumber[i][j]);
 			}
 		}
 		
@@ -169,12 +171,6 @@ public class MainUI extends JFrame {
 				jbNumber[i][j].setText(dbController.getBtNum(i, j) + "");
 				setButtonColor(jbNumber[i][j], dbController.getBtNum(i, j));
 			}
-		}
-		try {
-			Thread.currentThread().sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

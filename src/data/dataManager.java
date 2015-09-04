@@ -1,7 +1,5 @@
 package data;
 
-import javax.swing.plaf.SliderUI;
-
 public class dataManager {
 	//DB
 	dataDB gameDB;
@@ -19,160 +17,149 @@ public class dataManager {
 		gameDB.Initialize();
 	}
 	
+	public int getBtNum(int x, int y) {
+		return gameDB.getBtNumByPosition(x, y);
+	}
+	
+	private void moveButtonToEdge(buttonInfo[][] tBtInfo, int keyCode) {
+		if(keyCode == KEY_LEFT) {
+			for(int i=0; i<4; i++) {
+				for(int j=0; j<4; j++) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						for(int k=0; k<j; k++) {
+							if(tBtInfo[i][k].getNum() == 0) {
+								tBtInfo[i][k].setNum(tBtInfo[i][j].getNum());
+								tBtInfo[i][j].setNum(0);
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_UP) {
+			for(int i=0; i<4; i++) {
+				for(int j=0; j<4; j++) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						for(int k=0; k<i; k++) {
+							if(tBtInfo[k][j].getNum() == 0) {
+								tBtInfo[k][j].setNum(tBtInfo[i][j].getNum());
+								tBtInfo[i][j].setNum(0);
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_RIGHT) {
+			for(int i=0; i<4; i++) {
+				for(int j=3; j>=0; j--) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						for(int k=3; k>j; k--) {
+							if(tBtInfo[i][k].getNum() == 0) {
+								tBtInfo[i][k].setNum(tBtInfo[i][j].getNum());
+								tBtInfo[i][j].setNum(0);
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_DOWN) {
+			for(int i=3; i>=0; i--) {
+				for(int j=3; j>=0; j--) {
+					if(tBtInfo[i][j].getNum() != 0) {
+						for(int k=3; k>i; k--) {
+							if(tBtInfo[k][j].getNum() == 0) {
+								tBtInfo[k][j].setNum(tBtInfo[i][j].getNum());
+								tBtInfo[i][j].setNum(0);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void mergeButton(buttonInfo[][] tBtInfo, int keyCode) {
+		if(keyCode == KEY_LEFT) {
+			for(int i=0; i<4; i++) {
+				for(int j=0; j<4; j++) {
+					if(i < 4 && tBtInfo[i][j].getNum() != 0) {
+						for(int k=0; k<3; k++) {
+							if(tBtInfo[i][k].getNum() != 0 
+								&& (tBtInfo[i][k].getNum() == tBtInfo[i][k+1].getNum())) {
+								tBtInfo[i][k].setNum(tBtInfo[i][k+1].getNum()*2);
+								tBtInfo[i][k+1].setNum(0);
+								i++;
+								j=0;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_UP) {
+			for(int i=3; i>=0; i--) {
+				for(int j=0; j<4; j++) {
+					if(i >= 0 && tBtInfo[j][i].getNum() != 0) {
+						for(int k=0; k<3; k++) {
+							if(tBtInfo[j][i].getNum() != 0 
+								&& (tBtInfo[k][i].getNum() == tBtInfo[k+1][i].getNum())) {
+								tBtInfo[k][i].setNum(tBtInfo[k+1][i].getNum()*2);
+								tBtInfo[k+1][i].setNum(0);
+								i--;
+								j=0;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_RIGHT) {
+			for(int i=0; i<4; i++) {
+				for(int j=3; j>=0; j--) {
+					if(i < 4 && tBtInfo[i][j].getNum() != 0) {
+						for(int k=3; k>=1; k--) {
+							if(tBtInfo[i][k].getNum() != 0 
+								&& (tBtInfo[i][k].getNum() == tBtInfo[i][k-1].getNum())) {
+								tBtInfo[i][k].setNum(tBtInfo[i][k-1].getNum()*2);
+								tBtInfo[i][k-1].setNum(0);
+								i++;
+								j=3;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}else if(keyCode == KEY_DOWN) {
+			for(int i=3; i>=0; i--) {
+				for(int j=3; j>=0; j--) {
+					if(i >= 0 && tBtInfo[i][j].getNum() != 0) {
+						for(int k=3; k>=1; k--) {
+							if(tBtInfo[k][j].getNum() != 0 
+								&& (tBtInfo[k][j].getNum() == tBtInfo[k-1][j].getNum())) {
+								tBtInfo[k][j].setNum(tBtInfo[k-1][j].getNum()*2);
+								tBtInfo[k-1][j].setNum(0);
+								i--;
+								j=3;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public void processKeyData(int keyCode) {
 		//37 left, 38 up, 39 right, 40 down
 		buttonInfo[][] btInfo = gameDB.getAllDB();
 		
 		//Algorithm
 		//1. Move the all buttons to each side
-		for(int i=0; i<4; i++) {
-			for(int j=0; j<4; j++) {
-				if(keyCode == KEY_LEFT) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<j; k++) {
-							if(btInfo[i][k].getNum() == 0) {
-								btInfo[i][k].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_RIGHT) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=j; k--) {
-							if(btInfo[i][k].getNum() == 0) {
-								btInfo[i][k].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_UP) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<i; k++) {
-							if(btInfo[k][j].getNum() == 0) {
-								btInfo[k][j].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_DOWN) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=i; k--) {
-							if(btInfo[k][j].getNum() == 0) {
-								btInfo[k][j].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}
-			}
-		}
-		
+		moveButtonToEdge(btInfo, keyCode);
 		//2. Merge the buttons.
-		for(int i=0; i<4; i++) {
-			for(int j=0; j<4; j++) {
-				if(keyCode == KEY_LEFT) {
-					//Important logic
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<3; k++) {
-							if(btInfo[i][k].getNum() != 0 
-								&& (btInfo[i][k].getNum() == btInfo[i][k+1].getNum())) {
-								btInfo[i][k].setNum(btInfo[i][k+1].getNum()*2);
-								btInfo[i][k+1].setNum(0);
-								i++;
-								j=0;
-								break;
-							}
-						}
-					}
-				}else if(keyCode == KEY_RIGHT) {
-				//Important logic
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=1; k--) {
-							if(btInfo[i][k].getNum() != 0 
-								&& (btInfo[i][k].getNum() == btInfo[i][k-1].getNum())) {
-								btInfo[i][k].setNum(btInfo[i][k-1].getNum()*2);
-								btInfo[i][k-1].setNum(0);
-								i++;
-								j=0;
-								break;
-							}
-						}
-					}
-				}else if(keyCode == KEY_UP) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<3; k++) {
-							if(btInfo[k][j].getNum() != 0 
-								&& (btInfo[k][j].getNum() == btInfo[k+1][j].getNum())) {
-								btInfo[k][j].setNum(btInfo[k+1][j].getNum()*2);
-								btInfo[k+1][j].setNum(0);
-								i++;
-								j=0;
-								break;
-							}
-						}
-					}
-				}else if(keyCode == KEY_DOWN) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=1; k--) {
-							if(btInfo[k][j].getNum() != 0 
-								&& (btInfo[k][j].getNum() == btInfo[k-1][j].getNum())) {
-								btInfo[k][j].setNum(btInfo[k-1][j].getNum()*2);
-								btInfo[k-1][j].setNum(0);
-								i++;
-								j=0;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		
+		mergeButton(btInfo, keyCode);
 		//3. then move the button
-		for(int i=0; i<4; i++) {
-			for(int j=0; j<4; j++) {
-				if(keyCode == KEY_LEFT) {
-					//Important logic
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<j; k++) {
-							if(btInfo[i][k].getNum() == 0) {
-								btInfo[i][k].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_RIGHT) {
-				//Important logic
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=j; k--) {
-							if(btInfo[i][k].getNum() == 0) {
-								btInfo[i][k].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_UP) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=0; k<i; k++) {
-							if(btInfo[k][j].getNum() == 0) {
-								btInfo[k][j].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}else if(keyCode == KEY_DOWN) {
-					if(btInfo[i][j].getNum() != 0) {
-						for(int k=3; k>=i; k--) {
-							if(btInfo[k][j].getNum() == 0) {
-								btInfo[k][j].setNum(btInfo[i][j].getNum());
-								btInfo[i][j].setNum(0);
-							}
-						}
-					}
-				}
-			}
-		}
-		
+		moveButtonToEdge(btInfo, keyCode);
 		//4. Create new value
 		int rand_x, rand_y;
 		int randNum = (int)(Math.random()*2+1)*2;
@@ -186,11 +173,8 @@ public class dataManager {
 			}
 		}
 		btInfo[rand_x][rand_y].setNum(randNum);
-		//Algorithm
+		//end Algorithm
+		//update db to db storage
 		gameDB.setUpdatedDB(btInfo);
-	}
-	
-	public int getBtNum(int x, int y) {
-		return gameDB.getBtNumByPosition(x, y);
 	}
 }

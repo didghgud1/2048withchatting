@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import data.*;
 
 public class MainUI extends JFrame {
@@ -18,6 +21,8 @@ public class MainUI extends JFrame {
 	private static MainUI Instance;
 	private JPanel jpGamePanel;
 	private JButton[][] jbNumber;
+	private JDialog jdEndPopup;
+	private JButton jbResetButton;
 	//chatting
 	private JTextArea jtChattingTextArea;
 	private JScrollPane jsChattngTextPane;
@@ -58,6 +63,9 @@ public class MainUI extends JFrame {
 		//Game UI Initialize.
 		jpGamePanel = new JPanel();
 		jbNumber = new JButton[4][4];
+		jdEndPopup = new JDialog();
+		jdEndPopup.setResizable(false);
+		jbResetButton = new JButton("Reset");
 		for(int i=0; i<4; i++) {
 			for(int j=0; j<4; j++) {
 				jbNumber[i][j] = new JButton("no."+(i*4+j+1));
@@ -70,32 +78,6 @@ public class MainUI extends JFrame {
 		jtInputTextArea = new JTextArea();
 		jsInputTextPane = new JScrollPane(jtInputTextArea);
 		jbClickButton = new JButton("Send");
-	}
-
-	private void setResourceListener() {
-		this.setFocusable(true);
-		this.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				System.out.println("Key Pressed key code is" + e.getKeyCode());
-				//Process DB Data then change each button data
-				dbController.processKeyData(e.getKeyCode());
-				//redraw UI to correct information
-				refreshUI();
-				//Check the condition of end of this game
-			}
-		});
 	}
 	
 	private void setResourceOSDData() {
@@ -113,6 +95,8 @@ public class MainUI extends JFrame {
 				jpGamePanel.add(jbNumber[i][j]);
 			}
 		}
+		jdEndPopup.setLayout(new FlowLayout());
+		jdEndPopup.add(jbResetButton);
 		
 		jsChattngTextPane.setBounds(400, 10, 400, 300);
 		jsInputTextPane.setBounds(400, 320, 320, 80);
@@ -121,6 +105,93 @@ public class MainUI extends JFrame {
 		container.add(jsChattngTextPane);
 		container.add(jsInputTextPane);
 		container.add(jbClickButton);
+	}
+
+	private void setResourceListener() {
+		//get Game Key value
+		this.setFocusable(true);
+		this.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				//Process DB Data then change each button data
+				dbController.processKeyData(e.getKeyCode());
+				//redraw UI to correct information
+				refreshUI();
+				//Check the condition of end of this game
+				int gameStatus = dbController.checkWhetherGameEnd();
+				if(gameStatus == 0) {
+					//end case, show game over popup. then reset game.
+					//should make show popup func
+					jdEndPopup.setTitle("Game Over !");
+					jdEndPopup.setSize(300, 100);
+					Point location = jpGamePanel.getLocationOnScreen();
+					int x = location.x;
+					int y = location.y;
+					jdEndPopup.setLocation(x, y);
+					jdEndPopup.setVisible(true);
+				}else if(gameStatus == 1) {
+					//end case, show game win popup. then reset game.
+					//should make show popup func
+					jdEndPopup.setTitle("You Win !");
+					jdEndPopup.setSize(300, 100); 
+					Point location = jpGamePanel.getLocationOnScreen();
+					int x = location.x;
+					int y = location.y;
+					jdEndPopup.setLocation(x, y);
+					jdEndPopup.setVisible(true);
+				}
+				//else case, Game is being continue
+			}
+		});
+		
+		//get dialog button, should reset the game.
+		jbResetButton.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("clicked");
+				//reset game
+				dbController.resetGame();
+				jdEndPopup.dispose();
+				refreshUI();
+			}
+		});
 	}
 
 	private void setButtonColor(JButton jbButton, int num) {

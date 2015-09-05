@@ -14,11 +14,115 @@ public class dataManager {
 		if(gameDB == null) {
 			System.out.println("Fail to create DB");
 		}
-		gameDB.Initialize();
+		resetGame();
 	}
 	
 	public int getBtNum(int x, int y) {
 		return gameDB.getBtNumByPosition(x, y);
+	}
+	
+	
+	public void processKeyData(int keyCode) {
+		//37 left, 38 up, 39 right, 40 down
+		buttonInfo[][] btInfo = gameDB.getAllDB();
+		
+		//Algorithm
+		//1. Move the all buttons to each side
+		moveButtonToEdge(btInfo, keyCode);
+		//2. Merge the buttons.
+		mergeButton(btInfo, keyCode);
+		//3. then move the button
+		moveButtonToEdge(btInfo, keyCode);
+		//4. Create new value
+		int rand_x, rand_y;
+		int randNum = (int)(Math.random()*2+1)*2;
+		//random location find
+		while(true) {
+			rand_x = (int)(Math.random()*4);
+			rand_y = (int)(Math.random()*4);
+			
+			if(btInfo[rand_x][rand_y].getNum() == 0) {
+				break;
+			}
+		}
+		btInfo[rand_x][rand_y].setNum(randNum);
+		//end Algorithm
+		//update db to db storage
+		gameDB.setUpdatedDB(btInfo);
+	}
+	
+	public int checkWhetherGameEnd() {
+		buttonInfo[][] btInfo = gameDB.getAllDB();
+		//Case 1, All buttons are fully added, but Cannot move any tiles.
+		boolean tileFull = true;
+		for(int i=0; i<4; i++) {
+			for(int j=0; j<4; j++) {
+				if(btInfo[i][j].getNum() == 0) {
+					tileFull = false;
+					break;
+				}
+			}
+		}
+		
+		if(tileFull) {
+			boolean noTileCanMove = true;
+			for(int i=0; i<4; i++) {
+				for(int j=0; j<4; j++) {
+					if(i<4 && j<4) {
+						if(i>0) {
+							if(btInfo[i][j].getNum() == btInfo[i-1][j].getNum()) {
+								noTileCanMove = false;
+								i=4;
+								j=4;
+								break;
+							}
+						}
+						if (j>0) {
+							if(btInfo[i][j].getNum() == btInfo[i][j-1].getNum()) {
+								noTileCanMove = false;
+								i=4;
+								j=4;
+								break;
+							}
+						}
+						if (i<3) {
+							if(btInfo[i][j].getNum() == btInfo[i+1][j].getNum()) {
+								noTileCanMove = false;
+								i=4;
+								j=4;
+								break;
+							}
+						}
+						if(j<3) {
+							if(btInfo[i][j].getNum() == btInfo[i][j+1].getNum()) {
+								noTileCanMove = false;
+								i=4;
+								j=4;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(noTileCanMove) {
+				return 0;
+			}
+		}
+
+		//Case 2, 2048 is created.
+		for(int i=0; i<4; i++) {
+			for(int j=0; j<4; j++) {
+				if(btInfo[i][j].getNum() == 2048) {
+					return 1;
+				}
+			}
+		}
+		//else case, game should be continued.
+		return -1;
+	}
+	
+	public void resetGame() {
+		gameDB.Initialize();
 	}
 	
 	private void moveButtonToEdge(buttonInfo[][] tBtInfo, int keyCode) {
@@ -125,34 +229,5 @@ public class dataManager {
 				}
 			}
 		}
-	}
-	
-	public void processKeyData(int keyCode) {
-		//37 left, 38 up, 39 right, 40 down
-		buttonInfo[][] btInfo = gameDB.getAllDB();
-		
-		//Algorithm
-		//1. Move the all buttons to each side
-		moveButtonToEdge(btInfo, keyCode);
-		//2. Merge the buttons.
-		mergeButton(btInfo, keyCode);
-		//3. then move the button
-		moveButtonToEdge(btInfo, keyCode);
-		//4. Create new value
-		int rand_x, rand_y;
-		int randNum = (int)(Math.random()*2+1)*2;
-		//random location find
-		while(true) {
-			rand_x = (int)(Math.random()*4);
-			rand_y = (int)(Math.random()*4);
-			
-			if(btInfo[rand_x][rand_y].getNum() == 0) {
-				break;
-			}
-		}
-		btInfo[rand_x][rand_y].setNum(randNum);
-		//end Algorithm
-		//update db to db storage
-		gameDB.setUpdatedDB(btInfo);
 	}
 }
